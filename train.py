@@ -37,7 +37,7 @@ def corrupt_input(x, seq_len):
 def main():
     end_name = ''
     filename = "avgWires.csv"
-    doTraining = False
+    doTraining = True 
 
     print('\n\nLoading data...')
     startT_data = time.time()
@@ -49,15 +49,15 @@ def main():
     plotter = Plotter(print_dir="plots/", end_name=end_name)
 
     dataset = FeatureDataset(events)
-    val_size = 4000
+    val_size = 200000
     train_size = len(dataset) - val_size
     train_set, val_set = random_split(dataset, [train_size, val_size])
 
     print('\n\nTrain size:', train_size)
     print('Test size:', val_size)
 
-    train_loader = DataLoader(train_set, batch_size=32, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=32, shuffle=False)
+    train_loader = DataLoader(train_set, batch_size=32, num_workers=12, shuffle=True)
+    val_loader = DataLoader(val_set, batch_size=32,num_workers=12, shuffle=False)
 
     X_sample = next(iter(train_loader))
     print('X_sample:', X_sample.shape)  # e.g. torch.Size([32, 6])
@@ -72,7 +72,7 @@ def main():
     loss_tracker = LossTracker()
 
     trainer = pl.Trainer(
-        max_epochs=500,
+        max_epochs=100,
         enable_progress_bar=True,
         log_every_n_steps=1,
         enable_checkpointing=False,
