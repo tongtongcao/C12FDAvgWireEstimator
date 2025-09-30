@@ -15,5 +15,5 @@ For the estimator, inputs are two paramters:
 output is average wire of missing cluster.
 
 To apply the estimator in coatjava, an example for application of the estimator by ai.djl is developed.
-Install: mvn clean install
-Run: java -cp "target/TestDJL-1.0-SNAPSHOT.jar:target/lib/*" org.example.Main
+  Install: mvn clean install
+  Run: java -cp "target/TestDJL-1.0-SNAPSHOT.jar:target/lib/*" org.example.Main
