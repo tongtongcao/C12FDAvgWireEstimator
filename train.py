@@ -105,6 +105,8 @@ def main():
     all_preds = []
     all_targets = []
 
+    startT_test = time.time()
+
     with torch.no_grad():
         for batch in val_loader:
             # batch shape: [batch_size, seq_len]
@@ -114,6 +116,9 @@ def main():
 
             all_preds.append(y_pred.cpu())
             all_targets.append(y_true.cpu())
+
+    endT_test = time.time()
+    print(f'Test with {val_size} samples took {endT_test - startT_test:.2f}s \n\n')
 
     all_preds = torch.cat(all_preds)
     all_targets = torch.cat(all_targets)
