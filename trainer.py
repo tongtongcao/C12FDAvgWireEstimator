@@ -8,6 +8,8 @@ from pytorch_lightning.callbacks import Callback
 
 
 # --------- Dataset ---------
+# Wrap a list/array of sequences
+# Return tensors of shape [seq_len]
 class FeatureDataset(Dataset):
     def __init__(self, events):
         self.data = np.array(events, dtype=np.float32)
@@ -19,6 +21,8 @@ class FeatureDataset(Dataset):
         return torch.tensor(self.data[idx])
 
 # --------- Positional Encoding ---------
+# Implements sinusoidal positional encoding as in the original Transformer paper
+# Adds positional info to each timestep
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_len=5000):
         super().__init__()
@@ -43,7 +47,7 @@ class TransformerAutoencoder(pl.LightningModule):
         self.seq_len = seq_len
         self.d_model = d_model
 
-        self.input_proj = nn.Linear(1, d_model)
+        self.input_proj = nn.Linear(1, d_model) # projects scalar input to a vector space
         self.pos_encoder = PositionalEncoding(d_model=d_model)
 
         # Embedding for missing positions
@@ -95,28 +99,6 @@ class TransformerAutoencoder(pl.LightningModule):
 
         x = x.permute(1, 0, 2)  # [seq_len-1, batch, d_model]
         x = self.transformer_encoder(x)
-
-        # Select the timestep from the same region as the masked feature
-        #batch_size, seq_len_minus1, d_model = x.shape[1], x.shape[0], x.shape[2]
-
-        # Compute selection index: +1 for even, -1 for odd
-        #offset = torch.where(mask_idx % 2 == 0, torch.ones_like(mask_idx), -torch.ones_like(mask_idx))
-
-        #selected_indices = mask_idx + offset
-
-        # Boundary check to ensure indices are within [0, seq_len_minus1 - 1]
-        #selected_indices = torch.clamp(selected_indices, min=0, max=seq_len_minus1 - 1)
-
-        # Switch back to [batch, seq_len-1, d_model] for easy indexing
-        #x = x.permute(1, 0, 2)  # [batch, seq_len-1, d_model]
-
-        #batch_indices = torch.arange(batch_size, device=x.device)
-
-        #x_selected = x[batch_indices, selected_indices, :]  # [batch, d_model]
-
-        # Use the last timestep of the Transformer output
-        #x = x.permute(1, 0, 2) # → [batch, seq_len-1, d_model]
-        #x_selected = x[:, -1, :]
 
         x = x.permute(1, 0, 2) # → [batch, seq_len-1, d_model]
         x_selected = x.mean(dim=1)  # → [batch, d_model]

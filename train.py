@@ -37,7 +37,7 @@ def corrupt_input(x, seq_len):
 def main():
     end_name = ''
     filename = "avgWires.csv"
-    doTraining = True 
+    doTraining = True
 
     print('\n\nLoading data...')
     startT_data = time.time()
@@ -56,8 +56,8 @@ def main():
     print('\n\nTrain size:', train_size)
     print('Test size:', val_size)
 
-    train_loader = DataLoader(train_set, batch_size=32, num_workers=12, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=32,num_workers=12, shuffle=False)
+    train_loader = DataLoader(train_set, batch_size=32, num_workers=4, shuffle=True)
+    val_loader = DataLoader(val_set, batch_size=32, num_workers=4, shuffle=False)
 
     X_sample = next(iter(train_loader))
     print('X_sample:', X_sample.shape)  # e.g. torch.Size([32, 6])

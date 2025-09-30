@@ -4,6 +4,7 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
 from matplotlib.colors import LogNorm
+from scipy.stats import norm
 
 plt.rcParams.update({
     'font.size': 40,
@@ -47,11 +48,30 @@ class Plotter:
 
     def plot_diff(self, preds, targets):
         plt.figure(figsize=(20, 20))
-        plt.hist(preds - targets, bins = 100)
+        diff = preds - targets
+        plt.hist(diff, bins = 1000, density=True)
         plt.xlim(-5, 5)
         plt.xlabel("Diff")
         plt.ylabel("Counts")
         plt.title("Diff. between prediction and target")
+
+        # Gaussian fit and plot the fitted Gaussian curve
+        fit_min, fit_max = -1, 1
+        mask = (diff >= fit_min) & (diff <= fit_max)
+        diff_fit = diff[mask]
+        mu, std = norm.fit(diff_fit)
+        xmin, xmax = plt.xlim()
+        x = np.linspace(xmin, xmax, 100)
+        p = norm.pdf(x, mu, std)
+        plt.plot(x, p, 'r', linewidth=2)
+        plt.text(
+            0.95, 0.95,
+            f"$\\mu = {mu:.2f}$\n$\\sigma = {std:.2f}$",
+            transform=plt.gca().transAxes,
+            ha="right", va="top",
+            bbox=dict(facecolor="white", alpha=0.7, edgecolor="black")
+        )
+
         outname = f"{self.print_dir}diff{self.end_name}.png"
         plt.savefig(outname)
         plt.close()
