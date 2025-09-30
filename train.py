@@ -8,6 +8,21 @@ from torch.utils.data import DataLoader, random_split
 import numpy as np
 import time
 
+import argparse
+import os
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Transformer Masked Autoencoder Training")
+    parser.add_argument("inputs", type=str, nargs="*", default=["avgWires.csv"],
+                        help="One or more input CSV files (default: avgWires.csv)")
+    parser.add_argument("--max_epochs", type=int, default=100,
+                        help="Number of training epochs")
+    parser.add_argument("--batch_size", type=int, default=32,
+                        help="Batch size for DataLoader")
+    parser.add_argument("--outdir", type=str, default="outputs",
+                        help="Directory to save models and plots")
+    return parser.parse_args()
+
 # -----------------------------
 # Helper function: create corrupted input by masking one element
 def corrupt_input(x, seq_len):
@@ -35,18 +50,29 @@ def corrupt_input(x, seq_len):
 # Main function
 
 def main():
+    args = parse_args()
+
+    inputs = args.inputs if args.inputs else ["avgWires.csv"]
+    outDir = args.outdir
+    maxEpochs = args.max_epochs
+    batchSize = args.batch_size
+
+    os.makedirs(args.outdir, exist_ok=True)
+
     end_name = ''
-    filename = "avgWires.csv"
     doTraining = True
 
     print('\n\nLoading data...')
     startT_data = time.time()
 
     # Read data
-    events = read_file(filename)
+    events = []
+    for fname in inputs:
+        print(f"Loading data from {fname} ...")
+        events.extend(read_file(fname))
 
     # Define plotter
-    plotter = Plotter(print_dir="plots/", end_name=end_name)
+    plotter = Plotter(print_dir=outDir, end_name=end_name)
 
     dataset = FeatureDataset(events)
     val_size = 200000
@@ -56,8 +82,8 @@ def main():
     print('\n\nTrain size:', train_size)
     print('Test size:', val_size)
 
-    train_loader = DataLoader(train_set, batch_size=32, num_workers=4, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=32, num_workers=4, shuffle=False)
+    train_loader = DataLoader(train_set, batch_size=batchSize, num_workers=4, shuffle=True)
+    val_loader = DataLoader(val_set, batch_size=batchSize, num_workers=4, shuffle=False)
 
     X_sample = next(iter(train_loader))
     print('X_sample:', X_sample.shape)  # e.g. torch.Size([32, 6])
@@ -72,7 +98,7 @@ def main():
     loss_tracker = LossTracker()
 
     trainer = pl.Trainer(
-        max_epochs=100,
+        max_epochs=maxEpochs,
         enable_progress_bar=True,
         log_every_n_steps=1,
         enable_checkpointing=False,
@@ -96,10 +122,10 @@ def main():
         x_corrupted, mask_idx = corrupt_input(example_batch, seq_len=model.seq_len)
         example_input = (x_corrupted, mask_idx)
         torchscript_model = torch.jit.trace(model, example_input)
-        torchscript_model.save(f"nets/tmae{end_name}.pt")
+        torchscript_model.save(f"{outDir}/tmae{end_name}.pt")
 
     # Load the model and run inference
-    model = torch.jit.load(f"nets/tmae{end_name}.pt")
+    model = torch.jit.load(f"{outDir}/tmae{end_name}.pt")
     model.eval()
 
     all_preds = []
