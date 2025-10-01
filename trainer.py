@@ -42,10 +42,11 @@ class PositionalEncoding(nn.Module):
 # --------- Transformer Autoencoder ---------
 class TransformerAutoencoder(pl.LightningModule):
 
-    def __init__(self, seq_len=6, d_model=32, nhead=4, num_layers=2):
+    def __init__(self, seq_len=6, d_model=32, nhead=4, num_layers=2, lr=1e-3):
         super().__init__()
         self.seq_len = seq_len
         self.d_model = d_model
+        self.lr = lr
 
         self.input_proj = nn.Linear(1, d_model) # projects scalar input to a vector space
         self.pos_encoder = PositionalEncoding(d_model=d_model)
@@ -126,7 +127,7 @@ class TransformerAutoencoder(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=1e-3)
+        return torch.optim.Adam(self.parameters(), lr=self.lr)
 
 class LossTracker(Callback):
     def __init__(self):

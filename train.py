@@ -29,6 +29,8 @@ def parse_args():
                         help="Number of attention heads in the transformer (default: 4)")
     parser.add_argument("--num_layers", type=int, default=2,
                         help="Number of transformer encoder layers (default: 2)")
+    parser.add_argument("--lr", type=float, default=1e-3,
+                        help="Learning rate for optimizer (default: 1e-3)")
     parser.add_argument("--no_train", action="store_true",
                         help="Skip training and only run inference using a saved model")
     return parser.parse_args()
@@ -106,7 +108,8 @@ def main():
         seq_len=X_sample.shape[1],
         d_model=32,
         nhead=args.nhead,
-        num_layers=args.num_layers
+        num_layers=args.num_layers,
+        lr=args.lr
     )
 
     loss_tracker = LossTracker()
