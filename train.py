@@ -25,6 +25,10 @@ def parse_args():
                         help="Directory to save models and plots")
     parser.add_argument("--end_name", type=str, default="",
                         help="Optional suffix to append to output files (default: none)")
+    parser.add_argument("--nhead", type=int, default=4,
+                        help="Number of attention heads in the transformer (default: 4)")
+    parser.add_argument("--num_layers", type=int, default=2,
+                        help="Number of transformer encoder layers (default: 2)")
     parser.add_argument("--no_train", action="store_true",
                         help="Skip training and only run inference using a saved model")
     return parser.parse_args()
@@ -98,8 +102,12 @@ def main():
     print(f'Loading data took {endT_data - startT_data:.2f}s \n\n')
 
     # Initialize model, assign seq_len attribute
-    model = TransformerAutoencoder()
-    model.seq_len = X_sample.shape[1]  # e.g. 6
+    model = TransformerAutoencoder(
+        seq_len=X_sample.shape[1],
+        d_model=32,
+        nhead=args.nhead,
+        num_layers=args.num_layers
+    )
 
     loss_tracker = LossTracker()
 
