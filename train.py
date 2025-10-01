@@ -13,6 +13,8 @@ import os
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Transformer Masked Autoencoder Training")
+    parser.add_argument("--device", choices=["cpu", "gpu"], default="gpu",
+                        help="Device to use for training (default: gpu if available)")
     parser.add_argument("inputs", type=str, nargs="*", default=["avgWires.csv"],
                         help="One or more input CSV files (default: avgWires.csv)")
     parser.add_argument("--max_epochs", type=int, default=100,
@@ -21,6 +23,10 @@ def parse_args():
                         help="Batch size for DataLoader")
     parser.add_argument("--outdir", type=str, default="outputs",
                         help="Directory to save models and plots")
+    parser.add_argument("--end_name", type=str, default="",
+                        help="Optional suffix to append to output files (default: none)")
+    parser.add_argument("--no_train", action="store_true",
+                        help="Skip training and only run inference using a saved model")
     return parser.parse_args()
 
 # -----------------------------
@@ -56,11 +62,11 @@ def main():
     outDir = args.outdir
     maxEpochs = args.max_epochs
     batchSize = args.batch_size
+    end_name = args.end_name
+    doTraining = not args.no_train
 
     os.makedirs(args.outdir, exist_ok=True)
 
-    end_name = ''
-    doTraining = True
 
     print('\n\nLoading data...')
     startT_data = time.time()
@@ -97,17 +103,28 @@ def main():
 
     loss_tracker = LossTracker()
 
-    trainer = pl.Trainer(
-        max_epochs=maxEpochs,
-        enable_progress_bar=True,
-        log_every_n_steps=1,
-        enable_checkpointing=False,
-        check_val_every_n_epoch=1,
-        num_sanity_val_steps=0,
-        callbacks=[loss_tracker]
-    )
-
     if doTraining:
+        # Device selection
+        if args.device == "cpu":
+            accelerator = "cpu"
+            devices = 1
+        else:
+            accelerator = "gpu" if torch.cuda.is_available() else "cpu"
+            devices = "auto" if accelerator == "gpu" else 1
+
+        trainer = pl.Trainer(
+            accelerator=accelerator,
+            devices=devices,
+            strategy="ddp" if accelerator == "gpu" else "auto",  # auto picks the right thing for 1 GPU vs multi-GPU
+            max_epochs=maxEpochs,
+            enable_progress_bar=True,
+            log_every_n_steps=1,
+            enable_checkpointing=False,
+            check_val_every_n_epoch=1,
+            num_sanity_val_steps=0,
+            callbacks=[loss_tracker]
+        )
+
         print('\n\nTraining...')
         startT_train = time.time()
         trainer.fit(model, train_loader, val_loader)
@@ -122,10 +139,13 @@ def main():
         x_corrupted, mask_idx = corrupt_input(example_batch, seq_len=model.seq_len)
         example_input = (x_corrupted, mask_idx)
         torchscript_model = torch.jit.trace(model, example_input)
-        torchscript_model.save(f"{outDir}/tmae{end_name}.pt")
+        torchscript_model.save(f"{outDir}/tmae_{end_name}.pt")
 
     # Load the model and run inference
-    model = torch.jit.load(f"{outDir}/tmae{end_name}.pt")
+    if doTraining:
+        model = torch.jit.load(f"{outDir}/tmae_{end_name}.pt")
+    else:
+        model = torch.jit.load(f"nets/tmae_default.pt")
     model.eval()
 
     all_preds = []

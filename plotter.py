@@ -42,7 +42,7 @@ class Plotter:
         plt.yscale('log')
         plt.legend()
         plt.tight_layout()
-        outname = f"{self.print_dir}/loss{self.end_name}.png"
+        outname = f"{self.print_dir}/loss_{self.end_name}.png"
         plt.savefig(outname)
         plt.close()
 
@@ -72,7 +72,7 @@ class Plotter:
             bbox=dict(facecolor="white", alpha=0.7, edgecolor="black")
         )
 
-        outname = f"{self.print_dir}/diff{self.end_name}.png"
+        outname = f"{self.print_dir}/diff_{self.end_name}.png"
         plt.savefig(outname)
         plt.close()
 
@@ -85,6 +85,6 @@ class Plotter:
         plt.title("prediction vs target")
         plt.plot([0, 112], [0, 112], 'r--', label='Ideal Prediction') # diagonal line
         plt.legend()
-        outname = f"{self.print_dir}/pred_target{self.end_name}.png"
+        outname = f"{self.print_dir}/pred_target_{self.end_name}.png"
         plt.savefig(outname)
         plt.close()
