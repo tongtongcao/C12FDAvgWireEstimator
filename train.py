@@ -13,8 +13,8 @@ import os
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Transformer Masked Autoencoder Training")
-    parser.add_argument("--device", choices=["cpu", "gpu"], default="gpu",
-                        help="Device to use for training (default: gpu if available)")
+    parser.add_argument("--device", type=str, choices=["cpu", "gpu", "auto"], default="auto",
+                        help="Choose device: cpu, gpu, or auto (default: auto)")
     parser.add_argument("inputs", type=str, nargs="*", default=["avgWires.csv"],
                         help="One or more input CSV files (default: avgWires.csv)")
     parser.add_argument("--max_epochs", type=int, default=100,
@@ -116,12 +116,32 @@ def main():
 
     if doTraining:
         # Device selection
+        # --------------------
         if args.device == "cpu":
             accelerator = "cpu"
             devices = 1
+
+        elif args.device == "gpu":
+            if torch.cuda.is_available():
+                accelerator = "gpu"
+                devices = 1
+            else:
+                print("GPU requested but not available. Falling back to CPU.")
+                accelerator = "cpu"
+                devices = 1
+
+        elif args.device == "auto":
+            if torch.cuda.is_available():
+                accelerator = "gpu"
+                devices = "auto"  # use all visible GPUs
+            else:
+                accelerator = "cpu"
+                devices = 1
+
         else:
-            accelerator = "gpu" if torch.cuda.is_available() else "cpu"
-            devices = "auto" if accelerator == "gpu" else 1
+            raise ValueError(f"Unknown device option: {args.device}")
+
+        print(f"Using accelerator={accelerator}, devices={devices}")
 
         trainer = pl.Trainer(
             accelerator=accelerator,
