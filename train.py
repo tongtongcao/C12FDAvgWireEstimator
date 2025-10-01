@@ -129,7 +129,7 @@ def main():
             strategy="ddp" if accelerator == "gpu" else "auto",  # auto picks the right thing for 1 GPU vs multi-GPU
             max_epochs=maxEpochs,
             enable_progress_bar=True,
-            log_every_n_steps=200,
+            log_every_n_steps=1000,
             enable_checkpointing=False,
             check_val_every_n_epoch=1,
             num_sanity_val_steps=0,
