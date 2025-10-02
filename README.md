@@ -1,10 +1,12 @@
 The package is to train avergage-wire estimator for missing cluster on a track by Transformer Masked Auto-Encoder (TMAE).\
 The AI model is designed by pytorch and pytorch-lightning.\
-Before run the package, site-packages need to be installed:
+Before run the package, site-packages need to be installed if CPU only:
 - pip install torch torchvision
 - pip install lightning
 - pip install matplotlib
 - pip install scipy
+
+If run the package with GPU, cuda needs to be installed.
   
 To run the package,
 - python3 train.py ...
