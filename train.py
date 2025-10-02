@@ -25,6 +25,8 @@ def parse_args():
                         help="Directory to save models and plots")
     parser.add_argument("--end_name", type=str, default="",
                         help="Optional suffix to append to output files (default: none)")
+    parser.add_argument("--d_model", type=int, default=32,
+                        help="Transformer embedding dimension (must be divisible by nhead)")
     parser.add_argument("--nhead", type=int, default=4,
                         help="Number of attention heads in the transformer (default: 4)")
     parser.add_argument("--num_layers", type=int, default=2,
@@ -104,9 +106,12 @@ def main():
     print(f'Loading data took {endT_data - startT_data:.2f}s \n\n')
 
     # Initialize model, assign seq_len attribute
+    if args.d_model % args.nhead != 0:
+        raise ValueError(f"d_model ({args.d_model}) must be divisible by nhead ({args.nhead})")
+
     model = TransformerAutoencoder(
         seq_len=X_sample.shape[1],
-        d_model=32,
+        d_model=args.d_model,
         nhead=args.nhead,
         num_layers=args.num_layers,
         lr=args.lr
