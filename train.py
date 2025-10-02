@@ -160,6 +160,7 @@ def main():
             enable_checkpointing=False,
             check_val_every_n_epoch=1,
             num_sanity_val_steps=0,
+            logger=False,  # disables lightning_logs
             callbacks=[loss_tracker]
         )
 
