@@ -153,7 +153,7 @@ def main():
         trainer = pl.Trainer(
             accelerator=accelerator,
             devices=devices,
-            strategy="ddp" if accelerator == "gpu" else "auto",  # auto picks the right thing for 1 GPU vs multi-GPU
+            strategy="auto",
             max_epochs=maxEpochs,
             enable_progress_bar=args.enable_progress_bar,
             log_every_n_steps=1000,
