@@ -35,6 +35,8 @@ def parse_args():
                         help="Learning rate for optimizer (default: 1e-3)")
     parser.add_argument("--no_train", action="store_true",
                         help="Skip training and only run inference using a saved model")
+    parser.add_argument("--enable_progress_bar", action="store_true",
+                        help="Enable progress bar during training (default: disabled)")
     return parser.parse_args()
 
 # -----------------------------
@@ -153,7 +155,7 @@ def main():
             devices=devices,
             strategy="ddp" if accelerator == "gpu" else "auto",  # auto picks the right thing for 1 GPU vs multi-GPU
             max_epochs=maxEpochs,
-            enable_progress_bar=True,
+            enable_progress_bar=args.enable_progress_bar,
             log_every_n_steps=1000,
             enable_checkpointing=False,
             check_val_every_n_epoch=1,
