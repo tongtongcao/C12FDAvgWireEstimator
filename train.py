@@ -165,11 +165,9 @@ def main():
 
         plotter.plotTrainLoss(loss_tracker)
 
-        # Save the model (create example input first)
-        example_batch = next(iter(train_loader))
-        x_corrupted, mask_idx = corrupt_input(example_batch, seq_len=model.seq_len)
-        example_input = (x_corrupted, mask_idx)
-        torchscript_model = torch.jit.trace(model, example_input)
+        # Save the model
+        model.to("cpu")
+        torchscript_model = torch.jit.script(model)
         torchscript_model.save(f"{outDir}/tmae_{end_name}.pt")
 
     # Load the model and run inference

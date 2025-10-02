@@ -51,7 +51,7 @@ public class Main {
             @Override
             public Float processOutput(TranslatorContext ctx, NDList list) throws Exception {
                 NDArray result = list.get(0);
-                return result.getFloat();   // return single float
+                return result.toFloatArray()[0];   // return single float
             }
 
             @Override
