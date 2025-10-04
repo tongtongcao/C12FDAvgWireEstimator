@@ -42,7 +42,7 @@ class PositionalEncoding(nn.Module):
 # --------- Transformer Autoencoder ---------
 class TransformerAutoencoder(pl.LightningModule):
 
-    def __init__(self, seq_len=6, d_model=32, nhead=4, num_layers=2, lr=1e-3):
+    def __init__(self, seq_len=6, d_model=64, nhead=2, num_layers=3, lr=2e-4):
         super().__init__()
         self.seq_len = seq_len
         self.d_model = d_model

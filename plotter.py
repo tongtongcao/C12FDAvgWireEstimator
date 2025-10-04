@@ -49,20 +49,25 @@ class Plotter:
     def plot_diff(self, preds, targets):
         plt.figure(figsize=(20, 20))
         diff = preds - targets
-        plt.hist(diff, bins = 1000, density=True)
+
+        # Plot histogram with real counts
+        counts, bins, _ = plt.hist(diff, bins=1000, density=False)
         plt.xlim(-5, 5)
         plt.xlabel("Diff")
         plt.ylabel("Counts")
         plt.title("Diff. between prediction and target")
 
-        # Gaussian fit and plot the fitted Gaussian curve
-        fit_min, fit_max = -1, 1
+        # Gaussian fit in restricted window
+        fit_min, fit_max = -0.5, 0.5
         mask = (diff >= fit_min) & (diff <= fit_max)
         diff_fit = diff[mask]
         mu, std = norm.fit(diff_fit)
-        xmin, xmax = plt.xlim()
-        x = np.linspace(xmin, xmax, 100)
-        p = norm.pdf(x, mu, std)
+
+        # Scale Gaussian to histogram counts
+        bin_width = bins[1] - bins[0]
+        x = np.linspace(bins[0], bins[-1], 500)
+        p = norm.pdf(x, mu, std) * len(diff_fit) * bin_width
+
         plt.plot(x, p, 'r', linewidth=2)
         plt.text(
             0.95, 0.95,
