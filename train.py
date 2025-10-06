@@ -98,8 +98,8 @@ def main():
     print('\n\nTrain size:', train_size)
     print('Test size:', val_size)
 
-    train_loader = DataLoader(train_set, batch_size=batchSize, num_workers=4, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=batchSize, num_workers=4, shuffle=False)
+    train_loader = DataLoader(train_set, batch_size=batchSize, shuffle=True)
+    val_loader = DataLoader(val_set, batch_size=batchSize, shuffle=False)
 
     X_sample = next(iter(train_loader))
     print('X_sample:', X_sample.shape)  # e.g. torch.Size([32, 6])
