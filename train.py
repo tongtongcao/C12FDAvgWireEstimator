@@ -16,7 +16,7 @@ def parse_args():
     parser.add_argument("--device", type=str, choices=["cpu", "gpu", "auto"], default="auto",
                         help="Choose device: cpu, gpu, or auto (default: auto)")
     parser.add_argument("inputs", type=str, nargs="*", default=["avgWires.csv"],
-                        help="One or more input CSV files (default: avgWires.csv)")
+                        help="One or more input CSV files")
     parser.add_argument("--max_epochs", type=int, default=150,
                         help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=32,
@@ -28,11 +28,11 @@ def parse_args():
     parser.add_argument("--d_model", type=int, default=64,
                         help="Transformer embedding dimension (must be divisible by nhead)")
     parser.add_argument("--nhead", type=int, default=2,
-                        help="Number of attention heads in the transformer (default: 4)")
+                        help="Number of attention heads in the transformer")
     parser.add_argument("--num_layers", type=int, default=3,
-                        help="Number of transformer encoder layers (default: 2)")
+                        help="Number of transformer encoder layers")
     parser.add_argument("--lr", type=float, default=2e-4,
-                        help="Learning rate for optimizer (default: 1e-3)")
+                        help="Learning rate for optimizer")
     parser.add_argument("--no_train", action="store_true",
                         help="Skip training and only run inference using a saved model")
     parser.add_argument("--enable_progress_bar", action="store_true",
