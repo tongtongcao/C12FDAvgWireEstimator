@@ -91,9 +91,11 @@ def main():
     plotter = Plotter(print_dir=outDir, end_name=end_name)
 
     dataset = FeatureDataset(events)
-    val_size = 200000
-    train_size = len(dataset) - val_size
-    train_set, val_set = random_split(dataset, [train_size, val_size])
+
+    train_size = int(0.8 * len(dataset))
+    val_size = len(dataset) - train_size
+    generator = torch.Generator().manual_seed(42)
+    train_set, val_set = random_split(dataset, [train_size, val_size], generator=generator)
 
     print('\n\nTrain size:', train_size)
     print('Test size:', val_size)
