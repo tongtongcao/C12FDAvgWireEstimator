@@ -1,14 +1,15 @@
 The package is to train avergage-wire estimator for missing cluster on a track by Transformer Masked Auto-Encoder (TMAE).\
 The AI model is designed by pytorch and pytorch-lightning.\
-Before run the package, site-packages need to be installed if CPU only:
-- pip install torch torchvision
-- pip install lightning
-- pip install matplotlib
-- pip install scipy
 
-If run the package with GPU, cuda needs to be installed.
+It is recommended to run the package in python virtual enviroment.
+  - To install python virtual enviromen for cup-only, source setup_pytorch_lightning_venv.csh
+  - To install python virtual enviromen for GPU, cuda needs to be installed. In ifarm, cuda 12.4 has been installed. Change "set use_cuda = 0" into "set use_cuda = 1", then source setup_pytorch_lightning_venv.csh. Python virtual enviromen for GPU will be installed.
+
+Then, enter python virtual enviroment,
+  - source venvs/torch-cpu/bin/activate.csh for cpu-only
+  - source venvs/torch-cu124/bin/activate.csh for GPU at ifarm
   
-To run the package,
+Finally, run the package,
 - python3 train.py ...
 
 Arguments:
