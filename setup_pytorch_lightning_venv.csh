@@ -6,7 +6,7 @@
 # ==============================
 
 # === User options ===
-set use_cuda = 1       # 1 = use CUDA, 0 = CPU only
+set use_cuda = 0       # 1 = use CUDA, 0 = CPU only
 
 if ( $use_cuda == 1 ) then
     set venv_dir = /work/clas12/users/caot/ai/venvs/torch-cu124
