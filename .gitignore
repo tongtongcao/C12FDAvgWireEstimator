@@ -6,5 +6,6 @@ __pycache__
 lightning_logs
 .idea
 target
+outputs
 
 
